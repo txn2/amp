@@ -13,7 +13,7 @@ cd amp
 kubectl apply -f ./k8s/00-namespace.yml
 ```
 
-Create Certificate as Kubernets Secret in the new **amp-system** Namespace:
+Create Certificate as Kubernets Secret in the new `amp-system` Namespace:
 
 ```shell script
 curl https://raw.githubusercontent.com/morvencao/kube-mutating-webhook-tutorial/master/deployment/webhook-create-signed-cert.sh -o cert-gen.sh
