@@ -1,0 +1,63 @@
+# Build customization
+build:
+  main: ./cmd/amp.go
+  binary: amp
+
+  env:
+    - CGO_ENABLED=0
+
+  # GOOS list to build in.
+  # For more info refer to https://golang.org/doc/install/source#environment
+  # Defaults are darwin and linux
+  goos:
+    - linux
+
+  # GOARCH to build in.
+  # For more info refer to https://golang.org/doc/install/source#environment
+  # Defaults are 386 and amd64
+  goarch:
+    - amd64
+
+  ldflags: -s -w -X main.Version={{.Version}}
+
+release:
+  # Repo in which the release will be created.
+  # Default is extracted from the origin remote URL.
+  github:
+    owner: txn2
+    name: amp
+
+  # If set to true, will not auto-publish the release.
+  # Default is false.
+  draft: false
+
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
+  prerelease: false
+
+  # You can change the name of the GitHub release.
+  # Default is ``
+  name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
+
+  # You can disable this pipe in order to not upload any artifacts to
+  # GitHub.
+  # Defaults to false.
+  disable: false
+
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    goarm: ''
+    binaries:
+      - amp
+    dockerfile: Dockerfile
+    image_templates:
+      - "txn2/amp:latest"
+      - "txn2/amp:{{ .Tag }}"
+      - "txn2/amp:{{ .Major }}"
+      - "txn2/amp:amd64-{{ .Tag }}"
+    build_flag_templates:
+      - "--label=org.label-schema.schema-version=1.0"
+      - "--label=org.label-schema.version={{.Version}}"
+      - "--label=org.label-schema.name={{.ProjectName}}"

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: amp
+  namespace: amp-system
+spec:
+  selector:
+    app: amp
+  ports:
+    - name: http-api
+      protocol: "TCP"
+      port: 443
+      targetPort: http-int
+  type: ClusterIP

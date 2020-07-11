@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amp
+  namespace: amp-system
+  labels:
+    app: amp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: amp
+  template:
+    metadata:
+      labels:
+        app: amp
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '2112'
+    spec:
+      serviceAccountName: amp-system
+      volumes:
+        - name: cert-vol
+          secret:
+            secretName: amp-cert
+      containers:
+        - name: amp
+          image: txn2/amp:0.0.0-alpha14
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: IP
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8443"
+            - name: MODE
+              value: "release"
+            - name: CERT_PATH
+              value: "/cert"
+            - name: ANNOTATION_EP
+              value: "amp.txn2.com/ep"
+          ports:
+            - name: http-int
+              containerPort: 8443
+            - name: http-mtx
+              containerPort: 2112
+          volumeMounts:
+            - name: cert-vol
+              mountPath: /cert
+              readOnly: true
