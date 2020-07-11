@@ -4,7 +4,7 @@
 
 `amp` is a Kubernetes [Dynamic Admission Control](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) mutating webhook **proxy** for Pods.
 
-`amp` receives Kubernetes Admission Review requests for Pod creation events from any Namespace labeled `amp.txn2.com/enabled=true` and forwards the [Pod definition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#pod-v1-core) as a JSON POST a custom HTTP endpoint defined as the value of the Namespace annotation `amp.txn2.com/ep`.  The custom HTTP endpoint receives a Pod definition for evaluation and returns an array of [JSONPatch](http://jsonpatch.com/) operations to `amp` (see [example](https://github.com/txn2/amp-wh-example/blob/c58b545f9739b95a110ff22eac1ec6c47a4943a4/amp_wh_example.go#L113)).
+`amp` receives Kubernetes Admission Review requests for Pod creation events from any Namespace labeled `amp.txn2.com/enabled=true` and forwards the [Pod definition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#pod-v1-core) as a JSON POST to a custom HTTP endpoint defined as the value of the Namespace annotation `amp.txn2.com/ep`.  The custom HTTP endpoint receives a Pod definition for evaluation and returns an array of [JSONPatch](http://jsonpatch.com/) operations to `amp` (see [example](https://github.com/txn2/amp-wh-example/blob/c58b545f9739b95a110ff22eac1ec6c47a4943a4/amp_wh_example.go#L113)).
 
 
 ## Example Implementation
