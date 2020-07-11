@@ -1,3 +1,5 @@
+![amp logo](amp.png)
+
 # Kubernetes Admission Mutation Proxy (amp)
 
 `amp` is a Kubernetes [Dynamic Admission Control](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) mutating webhook **proxy** for Pods.
