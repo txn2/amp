@@ -125,7 +125,7 @@ func (a *Api) MutatePodsHandler() gin.HandlerFunc {
 		responseAdmissionReview.Kind = "AdmissionReview"
 		responseAdmissionReview.APIVersion = "admission.k8s.io/v1"
 
-		a.Log.Info("sending response", zap.String("value", responseAdmissionReview.String()))
+		a.Log.Info("sending response", zap.ByteString("value", responseAdmissionReview.Response.Patch))
 
 		c.JSON(http.StatusOK, responseAdmissionReview)
 	}
