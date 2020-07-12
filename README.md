@@ -4,9 +4,12 @@
 
 `amp` is a Kubernetes [Dynamic Admission Control](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) mutating webhook **proxy** for Pods.
 
-`amp` receives Kubernetes Admission Review requests for Pod creation events from any Namespace labeled `amp.txn2.com/enabled=true` and forwards the [Pod definition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#pod-v1-core) as a JSON POST to a custom HTTP endpoint defined through the value of the Namespace annotation `amp.txn2.com/ep`.  The custom HTTP endpoint receives a Pod definition for evaluation and returns an array of [JSONPatch](http://jsonpatch.com/) operations to `amp` (see [example](https://github.com/txn2/amp-wh-example/blob/c58b545f9739b95a110ff22eac1ec6c47a4943a4/amp_wh_example.go#L113)).
+## Motivation
 
 The `amp` project focuses on simplifying the process of modifying Kubernetes Pods on creation through custom endpoints, adding, removing, and modifying init containers, volumes, environment variables, or any other component of the Pod specification.  The `amp` project originally stemmed from the need to add custom volumes and environment variables to Pods created by [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/); however, `amp` is useful for extending any system that creates Pods that should be interrogated and mutated with external resources and values. In the [JupyterHub](https://zero-to-jupyterhub.readthedocs.io/en/latest/) use case, JupyterHub [spawns](https://github.com/jupyterhub/kubespawner) a Pod for a user into a Namespace, Kubernetes notifies `amp` and `amp` send the Pod specification to a custom endpoint. The custom endpoint retrieves a username from a Pod annotation and sends patch operations back to `amp`, modifying the Pod with user-specific environment variables and volume mounts.
+
+## Overview
+`amp` receives Kubernetes Admission Review requests for Pod creation events from any Namespace labeled `amp.txn2.com/enabled=true` and forwards the [Pod definition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#pod-v1-core) as a JSON POST to a custom HTTP endpoint defined through the value of the Namespace annotation `amp.txn2.com/ep`.  The custom HTTP endpoint receives a Pod definition for evaluation and returns an array of [JSONPatch](http://jsonpatch.com/) operations to `amp` (see [example](https://github.com/txn2/amp-wh-example/blob/c58b545f9739b95a110ff22eac1ec6c47a4943a4/amp_wh_example.go#L113)).
 
 The following depiction illustrates a high-level view of an example endpoint named `some-app-b` mutating a Pod:
 
