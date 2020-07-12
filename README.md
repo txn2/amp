@@ -14,15 +14,15 @@ The following depiction illustrates a high-level view of an example endpoint nam
 
 1. Kubernetes receives a Pod creation event.
 
-2. Kubernetes [MutatingWebhookConfiguration](https://github.com/txn2/amp/blob/master/k8s/80-webhook.yml) for `amp` matches any Namespace labeled amp.txn2.com/enabled: true.
+2. Kubernetes [MutatingWebhookConfiguration](https://github.com/txn2/amp/blob/master/k8s/80-webhook.yml) for `amp` matches any Namespace labeled `amp.txn2.com/enabled: true`.
 
-3. Kubernetes sends an AdmissionReview object to `amp`.
+3. Kubernetes sends an `AdmissionReview` object to `amp`.
 
-4. `amp` extracts the `corev1.Pod` object from the AdmissionReview, looks up the custom endpoint annotated in the Pods Namespace and sends an HTTP POST of the `corev1.Pod` as JSON to the endpoint.
+4. `amp` extracts the `corev1.Pod` object from the `AdmissionReview`, looks up the custom endpoint annotated in the Pod's Namespace and sends an HTTP POST of the `corev1.Pod` as JSON to the endpoint.
 
-5. `amp` receives a JSON encoded array of PatchOpperations for the `corev1.Pod`.
+5. `amp` receives a JSON encoded array of [PatchOperations](https://github.com/txn2/amp-wh-example/blob/master/amp_wh_example.go#L28) for the `corev1.Pod`.
 
-6. `amp` responds to Kubernetes AdmissionReview with the received PatchOpperations as a response.
+6. `amp` responds to Kubernetes AdmissionReview with the received PatchOperations as a response.
 
 7. Kubernetes creates the new mutated Pod.
 
