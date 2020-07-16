@@ -142,6 +142,10 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 		zap.String("annotation", a.EpAnnotation),
 	}
 
+	reviewResponse := admissionv1.AdmissionResponse{}
+	// always allow (amp is only for pod mutation)
+	reviewResponse.Allowed = true
+
 	podResource := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}
 	if ar.Request.Resource != podResource {
 		a.Log.Error("unexpected resource",
@@ -157,7 +161,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 	pod := corev1.Pod{}
 	deserializer := codecs.UniversalDeserializer()
 	if _, _, err := deserializer.Decode(raw, nil, &pod); err != nil {
-		a.Log.Warn("deserializer failure", zap.Error(err))
+		a.Log.Error("deserializer failure", zap.Error(err))
 		return &reviewResponse
 	}
 	logInfo = append(logInfo, zap.String("Pod", pod.Name))
@@ -170,13 +174,10 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 		)...,
 	)
 
-	reviewResponse := admissionv1.AdmissionResponse{}
-	// always allow (amp is only for pod mutation)
-	reviewResponse.Allowed = true
 
 	ns, err := a.Cs.CoreV1().Namespaces().Get(pod.Namespace, metav1.GetOptions{})
 	if err != nil {
-		a.Log.Warn("unable to get namespace",
+		a.Log.Error("unable to get namespace",
 			append(logInfo, zap.Error(err))...,
 		)
 		return &reviewResponse
