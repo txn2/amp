@@ -26,7 +26,7 @@ spec:
             secretName: amp-cert
       containers:
         - name: amp
-          image: txn2/amp:1.0.1
+          image: txn2/amp:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: IP
