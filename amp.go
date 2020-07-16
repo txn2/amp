@@ -157,19 +157,18 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 	pod := corev1.Pod{}
 	deserializer := codecs.UniversalDeserializer()
 	if _, _, err := deserializer.Decode(raw, nil, &pod); err != nil {
-		a.Log.Error("deserializer failure", zap.Error(err))
-		return toAdmissionResponse(err)
+		a.Log.Warn("deserializer failure", zap.Error(err))
+		return &reviewResponse
 	}
 	logInfo = append(logInfo, zap.String("Pod", pod.Name))
 
 	a.Log.Info("Pod for review",
 		append(logInfo,
-			zap.Any("Labels", pod.Labels),
-			zap.Any("Annotation", pod.Annotations),
+			zap.Any("PodLabels", pod.Labels),
+			zap.Any("PodAnnotations", pod.Annotations),
+			zap.Any("PodNamespace", pod.Namespace),
 		)...,
 	)
-
-
 
 	reviewResponse := admissionv1.AdmissionResponse{}
 	// always allow (amp is only for pod mutation)
@@ -177,10 +176,10 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 
 	ns, err := a.Cs.CoreV1().Namespaces().Get(pod.Namespace, metav1.GetOptions{})
 	if err != nil {
-		a.Log.Error("unable to get namespace",
+		a.Log.Warn("unable to get namespace",
 			append(logInfo, zap.Error(err))...,
 		)
-		return toAdmissionResponse(err)
+		return &reviewResponse
 	}
 
 	// lookup endpoint by namespace annotation
