@@ -174,8 +174,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 		)...,
 	)
 
-
-	ns, err := a.Cs.CoreV1().Namespaces().Get(pod.Namespace, metav1.GetOptions{})
+	ns, err := a.Cs.CoreV1().Namespaces().Get(ar.Request.Namespace, metav1.GetOptions{})
 	if err != nil {
 		a.Log.Error("unable to get namespace",
 			append(logInfo, zap.Error(err))...,
