@@ -28,14 +28,15 @@ import (
 )
 
 var (
-	ipEnv               = getEnv("IP", "127.0.0.1")
-	portEnv             = getEnv("PORT", "8070")
-	metricsPortEnv      = getEnv("METRICS_PORT", "2112")
-	modeEnv             = getEnv("MODE", "release")
-	httpReadTimeoutEnv  = getEnv("HTTP_READ_TIMEOUT", "10")
-	httpWriteTimeoutEnv = getEnv("HTTP_WRITE_TIMEOUT", "10")
-	certPathEnv         = getEnv("CERT_PATH", "")
-	epAnnotationEnv     = getEnv("ANNOTATION_EP", "amp.txn2.com/ep")
+	ipEnv                     = getEnv("IP", "127.0.0.1")
+	portEnv                   = getEnv("PORT", "8070")
+	metricsPortEnv            = getEnv("METRICS_PORT", "2112")
+	modeEnv                   = getEnv("MODE", "release")
+	httpReadTimeoutEnv        = getEnv("HTTP_READ_TIMEOUT", "10")
+	httpWriteTimeoutEnv       = getEnv("HTTP_WRITE_TIMEOUT", "10")
+	certPathEnv               = getEnv("CERT_PATH", "")
+	epAnnotationEnv           = getEnv("ANNOTATION_EP", "amp.txn2.com/ep")
+	epValidatingAnnotationEnv = getEnv("VALIDATING_ANNOTATION_EP", "amp.txn2.com/ep/validating")
 )
 
 var Version = "0.0.0"
@@ -71,14 +72,15 @@ func main() {
 	}
 
 	var (
-		ip               = flag.String("ip", ipEnv, "Server IP address to bind to.")
-		port             = flag.String("port", portEnv, "Server port.")
-		certPath         = flag.String("certPath", certPathEnv, "Cert path. If populated will serve TLS.")
-		metricsPort      = flag.String("metricsPort", metricsPortEnv, "Metrics port.")
-		mode             = flag.String("mode", modeEnv, "debug or release")
-		httpReadTimeout  = flag.Int("httpReadTimeout", httpReadTimeoutInt, "HTTP read timeout")
-		httpWriteTimeout = flag.Int("httpWriteTimeout", httpWriteTimeoutInt, "HTTP write timeout")
-		epAnnotation     = flag.String("epAnnotation", epAnnotationEnv, "Endpoint annotation")
+		ip                     = flag.String("ip", ipEnv, "Server IP address to bind to.")
+		port                   = flag.String("port", portEnv, "Server port.")
+		certPath               = flag.String("certPath", certPathEnv, "Cert path. If populated will serve TLS.")
+		metricsPort            = flag.String("metricsPort", metricsPortEnv, "Metrics port.")
+		mode                   = flag.String("mode", modeEnv, "debug or release")
+		httpReadTimeout        = flag.Int("httpReadTimeout", httpReadTimeoutInt, "HTTP read timeout")
+		httpWriteTimeout       = flag.Int("httpWriteTimeout", httpWriteTimeoutInt, "HTTP write timeout")
+		epAnnotation           = flag.String("epAnnotation", epAnnotationEnv, "Endpoint annotation")
+		epValidatingAnnotation = flag.String("epValidatingAnnotation", epValidatingAnnotationEnv, "Endpoint annotation for validating")
 	)
 	flag.Parse()
 
@@ -169,10 +171,11 @@ func main() {
 
 	// get api
 	api, err := amp.NewApi(&amp.Config{
-		Log:          logger,
-		HttpClient:   httpClient,
-		Cs:           cs,
-		EpAnnotation: *epAnnotation,
+		Log:                    logger,
+		HttpClient:             httpClient,
+		Cs:                     cs,
+		EpAnnotation:           *epAnnotation,
+		EpValidatingAnnotation: *epValidatingAnnotation,
 	})
 	if err != nil {
 		logger.Fatal("Error getting API.", zap.Error(err))
@@ -181,8 +184,11 @@ func main() {
 	// status
 	r.GET("/", api.OkHandler(Version, *mode, Service))
 
-	// status
-	r.POST("/mutate", api.MutatePodsHandler())
+	// validate proxy
+	r.POST("/validate", api.AdmissionReviewHandler(amp.AdmisionReviewValidate))
+
+	// mutate proxy
+	r.POST("/mutate", api.AdmissionReviewHandler(amp.AdmisionReviewMutate))
 
 	// metrics server (run in go routine)
 	go func() {
