@@ -31,7 +31,7 @@ The following depiction illustrates a high-level view of an example endpoint nam
 
 ### Example patch operations
 ```go
-[]PatchOperation{
+po := []PatchOperation{
     // add initContainer
     {
         Op:   "add",
@@ -47,7 +47,7 @@ The following depiction illustrates a high-level view of an example endpoint nam
         Path: "/spec/containers/0/env/-",
         Value: corev1.EnvVar{
             Name:  "ADDED_VAR",
-            Value: "somthing important",
+            Value: "something important",
         },
     },
 }
