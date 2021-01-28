@@ -140,7 +140,8 @@ func (a *Api) AdmissionReviewHandler(admissionReview AdmissionReview) gin.Handle
 		responseAdmissionReview.Kind = "AdmissionReview"
 		responseAdmissionReview.APIVersion = "admission.k8s.io/v1"
 
-		a.Log.Info("Returning response to Kubernetes", zap.ByteString("value", responseAdmissionReview.Response.Patch))
+		a.Log.Info("Returning response to Kubernetes")
+		a.Log.Debug("Response debugging, responseAdmissionReview", zap.ByteString("value", responseAdmissionReview.Response.Patch))
 
 		c.JSON(http.StatusOK, responseAdmissionReview)
 	}
