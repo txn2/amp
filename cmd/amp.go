@@ -185,10 +185,10 @@ func main() {
 	r.GET("/", api.OkHandler(Version, *mode, Service))
 
 	// validate proxy
-	r.POST("/validate", api.AdmissionReviewHandler(amp.AdmisionReviewValidate))
+	r.POST("/validate", api.AdmissionReviewHandler(amp.AdmissionReviewValidate))
 
 	// mutate proxy
-	r.POST("/mutate", api.AdmissionReviewHandler(amp.AdmisionReviewMutate))
+	r.POST("/mutate", api.AdmissionReviewHandler(amp.AdmissionReviewMutate))
 
 	// metrics server (run in go routine)
 	go func() {

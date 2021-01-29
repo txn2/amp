@@ -24,8 +24,8 @@ import (
 type AdmissionReview string
 
 const (
-	AdmisionReviewValidate AdmissionReview = "validate"
-	AdmisionReviewMutate   AdmissionReview = "mutate"
+	AdmissionReviewValidate AdmissionReview = "validate"
+	AdmissionReviewMutate   AdmissionReview = "mutate"
 )
 
 // Config configures the API
@@ -125,12 +125,12 @@ func (a *Api) AdmissionReviewHandler(admissionReview AdmissionReview) gin.Handle
 			responseAdmissionReview.Response = toAdmissionResponse(err)
 		} else {
 			// mutate
-			if admissionReview == AdmisionReviewMutate {
+			if admissionReview == AdmissionReviewMutate {
 				responseAdmissionReview.Response = a.mutatePod(requestedAdmissionReview)
 			}
 
 			// validate
-			if admissionReview == AdmisionReviewValidate {
+			if admissionReview == AdmissionReviewValidate {
 				responseAdmissionReview.Response = a.validatePod(requestedAdmissionReview)
 			}
 		}
