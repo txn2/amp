@@ -37,8 +37,6 @@ spec:
               value: "release"
             - name: CERT_PATH
               value: "/cert"
-            - name: ANNOTATION_EP
-              value: "amp.txn2.com/ep"
           ports:
             - name: http-int
               containerPort: 8443

@@ -36,7 +36,7 @@ var (
 	httpWriteTimeoutEnv       = getEnv("HTTP_WRITE_TIMEOUT", "10")
 	certPathEnv               = getEnv("CERT_PATH", "")
 	mutationEpAnnotationEnv   = getEnv("MUTATION_EP_ANNOTATION", "mutation.amp.txn2.com/ep")
-	validationEpAnnotationEnv = getEnv("VALIDATION_ANNOTATION_EP", "validation.amp.txn2.com/ep")
+	validationEpAnnotationEnv = getEnv("VALIDATION_EP_ANNOTATION", "validation.amp.txn2.com/ep")
 )
 
 var Version = "0.0.0"
