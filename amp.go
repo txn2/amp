@@ -33,8 +33,8 @@ type Config struct {
 	Log                    *zap.Logger
 	HttpClient             *http.Client
 	Cs                     *kubernetes.Clientset
-	EpAnnotation           string
-	EpValidatingAnnotation string
+	MutationEpAnnotation   string
+	ValidationEpAnnotation string
 }
 
 // Api
@@ -155,7 +155,7 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 
 	logInfo := []zap.Field{
 		zap.String("namespace", ar.Request.Namespace),
-		zap.String("annotation", a.EpAnnotation),
+		zap.String("annotation", a.MutationEpAnnotation),
 	}
 
 	reviewResponse := admissionv1.AdmissionResponse{}
@@ -199,7 +199,7 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 
 	// lookup endpoint by namespace annotation
 	annotations := ns.GetAnnotations()
-	ep, ok := annotations[a.EpValidatingAnnotation]
+	ep, ok := annotations[a.ValidationEpAnnotation]
 	if ok == false {
 		a.Log.Warn("DEFAULT ALLOW if no validation endpoint is configured for namespace.", logInfo...)
 		reviewResponse.Allowed = true
@@ -208,7 +208,7 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 
 	logInfo = append(logInfo,
 		zap.String("endpoint", ep),
-		zap.String("annotation", a.EpValidatingAnnotation),
+		zap.String("annotation", a.ValidationEpAnnotation),
 	)
 
 	a.Log.Info("got validation endpoint from namespace", logInfo...)
@@ -303,7 +303,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 
 	logInfo := []zap.Field{
 		zap.String("namespace", ar.Request.Namespace),
-		zap.String("annotation", a.EpAnnotation),
+		zap.String("annotation", a.MutationEpAnnotation),
 	}
 
 	reviewResponse := admissionv1.AdmissionResponse{}
@@ -348,7 +348,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 
 	// lookup endpoint by namespace annotation
 	annotations := ns.GetAnnotations()
-	ep, ok := annotations[a.EpAnnotation]
+	ep, ok := annotations[a.MutationEpAnnotation]
 	if ok == false {
 		a.Log.Warn("no endpoint configured for namespace", logInfo...)
 		return &reviewResponse
@@ -356,7 +356,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 
 	logInfo = append(logInfo,
 		zap.String("endpoint", ep),
-		zap.String("annotation", a.EpAnnotation),
+		zap.String("annotation", a.MutationEpAnnotation),
 	)
 
 	a.Log.Info("got endpoint from namespace", logInfo...)

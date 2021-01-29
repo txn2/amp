@@ -35,8 +35,8 @@ var (
 	httpReadTimeoutEnv        = getEnv("HTTP_READ_TIMEOUT", "10")
 	httpWriteTimeoutEnv       = getEnv("HTTP_WRITE_TIMEOUT", "10")
 	certPathEnv               = getEnv("CERT_PATH", "")
-	epAnnotationEnv           = getEnv("ANNOTATION_EP", "amp.txn2.com/ep")
-	epValidatingAnnotationEnv = getEnv("VALIDATING_ANNOTATION_EP", "amp.txn2.com/ep/validating")
+	mutationEpAnnotationEnv   = getEnv("MUTATION_EP_ANNOTATION", "mutation.amp.txn2.com/ep")
+	validationEpAnnotationEnv = getEnv("VALIDATION_ANNOTATION_EP", "validation.amp.txn2.com/ep")
 )
 
 var Version = "0.0.0"
@@ -79,8 +79,8 @@ func main() {
 		mode                   = flag.String("mode", modeEnv, "debug or release")
 		httpReadTimeout        = flag.Int("httpReadTimeout", httpReadTimeoutInt, "HTTP read timeout")
 		httpWriteTimeout       = flag.Int("httpWriteTimeout", httpWriteTimeoutInt, "HTTP write timeout")
-		epAnnotation           = flag.String("epAnnotation", epAnnotationEnv, "Endpoint annotation")
-		epValidatingAnnotation = flag.String("epValidatingAnnotation", epValidatingAnnotationEnv, "Endpoint annotation for validating")
+		mutationEpAnnotation   = flag.String("mutationEpAnnotation", mutationEpAnnotationEnv, "Mutation endpoint annotation")
+		validationEpAnnotation = flag.String("validationEpAnnotation", validationEpAnnotationEnv, "Validation endpoint annotation")
 	)
 	flag.Parse()
 
@@ -174,8 +174,8 @@ func main() {
 		Log:                    logger,
 		HttpClient:             httpClient,
 		Cs:                     cs,
-		EpAnnotation:           *epAnnotation,
-		EpValidatingAnnotation: *epValidatingAnnotation,
+		MutationEpAnnotation:   *mutationEpAnnotation,
+		ValidationEpAnnotation: *validationEpAnnotation,
 	})
 	if err != nil {
 		logger.Fatal("Error getting API.", zap.Error(err))
