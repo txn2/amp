@@ -90,8 +90,13 @@ func NewApi(cfg *Config) (*Api, error) {
 
 func (a *Api) AdmissionReviewHandler(admissionReview AdmissionReview) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		a.Log.Info("AdmissionReview request", zap.Any("type", admissionReview))
+
 		rs, err := c.GetRawData()
 		if err != nil {
+			a.Log.Error("AdmissionReviewHandler is unable to parse request body",
+				zap.Error(err),
+				zap.ByteString("raw_data", rs))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"message": "unable to parse request body",
 				"error":   err.Error(),
@@ -102,6 +107,8 @@ func (a *Api) AdmissionReviewHandler(admissionReview AdmissionReview) gin.Handle
 		// verify the content type
 		contentType := c.GetHeader("Content-Type")
 		if contentType != "application/json" {
+			a.Log.Error("AdmissionReviewHandler content type expected application/json",
+				zap.String("content_type", contentType))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": fmt.Sprintf("contentType=%s, expected application/json", contentType),
 			})
