@@ -37,7 +37,6 @@ type Config struct {
 	ValidationEpAnnotation string
 }
 
-// Api
 type Api struct {
 	*Config
 }
@@ -63,7 +62,6 @@ type PatchOperation struct {
 	Value interface{} `json:"value,omitempty"`
 }
 
-// NewApi
 func NewApi(cfg *Config) (*Api, error) {
 	a := &Api{Config: cfg}
 
@@ -90,7 +88,6 @@ func NewApi(cfg *Config) (*Api, error) {
 	return a, nil
 }
 
-// AdmissionReviewHandler
 func (a *Api) AdmissionReviewHandler(admissionReview AdmissionReview) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rs, err := c.GetRawData()
@@ -295,7 +292,6 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 	return &reviewResponse
 }
 
-// mutatePod
 func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionResponse {
 	a.Log.Info("started mutatePod admission review",
 		zap.Bool("DryRun", *ar.Request.DryRun),
@@ -445,7 +441,6 @@ func toAdmissionResponse(err error) *admissionv1.AdmissionResponse {
 	}
 }
 
-// OkHandler
 func (a *Api) OkHandler(version string, mode string, service string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"version": version, "mode": mode, "service": service})
