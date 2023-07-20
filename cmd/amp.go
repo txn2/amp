@@ -34,7 +34,8 @@ var (
 	modeEnv                   = getEnv("MODE", "release")
 	httpReadTimeoutEnv        = getEnv("HTTP_READ_TIMEOUT", "10")
 	httpWriteTimeoutEnv       = getEnv("HTTP_WRITE_TIMEOUT", "10")
-	certPathEnv               = getEnv("CERT_PATH", "")
+	certPathCrtEnv            = getEnv("CERT_PATH_CRT", "/cert/tls.crt")
+	certPathKeyEnv            = getEnv("CERT_PATH_KEY", "/cert/tls.key")
 	mutationEpAnnotationEnv   = getEnv("MUTATION_EP_ANNOTATION", "mutation.amp.txn2.com/ep")
 	validationEpAnnotationEnv = getEnv("VALIDATION_EP_ANNOTATION", "validation.amp.txn2.com/ep")
 )
@@ -74,7 +75,8 @@ func main() {
 	var (
 		ip                     = flag.String("ip", ipEnv, "Server IP address to bind to.")
 		port                   = flag.String("port", portEnv, "Server port.")
-		certPath               = flag.String("certPath", certPathEnv, "Cert path. If populated will serve TLS.")
+		certPathCrt            = flag.String("certPathCrt", certPathCrtEnv, "Cert path tls.crt. If populated along with certPathKey will serve TLS.")
+		certPathKey            = flag.String("certPathKey", certPathKeyEnv, "Cert path tls.key. If populated along with certPathCrt will serve TLS.")
 		metricsPort            = flag.String("metricsPort", metricsPortEnv, "Metrics port.")
 		mode                   = flag.String("mode", modeEnv, "debug or release")
 		httpReadTimeout        = flag.Int("httpReadTimeout", httpReadTimeoutInt, "HTTP read timeout")
@@ -216,11 +218,8 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
-	if *certPath != "" {
-		certFile := *certPath + "/cert.pem"
-		keyFile := *certPath + "/key.pem"
-
-		err = s.ListenAndServeTLS(certFile, keyFile)
+	if *certPathKey != "" && *certPathCrt != "" {
+		err = s.ListenAndServeTLS(*certPathCrt, *certPathKey)
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
