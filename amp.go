@@ -2,10 +2,11 @@ package amp
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -193,7 +194,7 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 		)...,
 	)
 
-	ns, err := a.Cs.CoreV1().Namespaces().Get(ar.Request.Namespace, metav1.GetOptions{})
+	ns, err := a.Cs.CoreV1().Namespaces().Get(context.TODO(), ar.Request.Namespace, metav1.GetOptions{})
 	if err != nil {
 		a.Log.Error("unable to get namespace",
 			append(logInfo, zap.Error(err))...,
@@ -268,7 +269,7 @@ func (a *Api) validatePod(ar admissionv1.AdmissionReview) *admissionv1.Admission
 		return &reviewResponse
 	}
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		a.Log.Error("Error reading response body",
 			append(logInfo, zap.Error(err))...,
@@ -341,7 +342,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 		)...,
 	)
 
-	ns, err := a.Cs.CoreV1().Namespaces().Get(ar.Request.Namespace, metav1.GetOptions{})
+	ns, err := a.Cs.CoreV1().Namespaces().Get(context.TODO(), ar.Request.Namespace, metav1.GetOptions{})
 	if err != nil {
 		a.Log.Error("unable to get namespace",
 			append(logInfo, zap.Error(err))...,
@@ -395,7 +396,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 		return &reviewResponse
 	}
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		a.Log.Error("Error reading response body",
 			append(logInfo, zap.Error(err))...,
@@ -424,7 +425,7 @@ func (a *Api) mutatePod(ar admissionv1.AdmissionReview) *admissionv1.AdmissionRe
 	// TODO: Validate PatchOperation
 	err = json.Unmarshal(respBody, &po)
 	if err != nil {
-		a.Log.Error("Error unmarshaling response body into PatchOperation",
+		a.Log.Error("Error unmarshalling response body into PatchOperation",
 			append(logInfo, zap.Error(err))...,
 		)
 		return &reviewResponse
