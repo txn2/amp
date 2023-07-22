@@ -1,0 +1,21 @@
+kind: Certificate
+apiVersion: cert-manager.io/v1
+metadata:
+  name: client
+  namespace: amp-system
+spec:
+  issuerRef:
+    name: ca-root # see ./000-cert-manager/README.md
+    kind: ClusterIssuer
+  secretName: client-cert
+  duration: 2160h
+  renewBefore: 240h
+  dnsNames:
+    - amp.txn2.com # webhook. see 80-webhook.yml
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  usages:
+    - client auth
+    - server auth

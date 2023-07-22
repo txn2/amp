@@ -14,7 +14,7 @@ webhooks:
         name: amp
         namespace: amp-system
         path: "/mutate"
-      caBundle: REPLACE
+      # caBundle: REPLACE or use cert-manager (see 000-cert-manager/README.md
     rules:
       - operations: ["CREATE"]
         apiGroups: [""]

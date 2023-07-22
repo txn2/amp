@@ -1,0 +1,21 @@
+kind: Certificate
+apiVersion: cert-manager.io/v1
+metadata:
+  name: server
+  namespace: amp-system
+spec:
+  issuerRef:
+    name: ca-root # see ./000-cert-manager/README.md
+    kind: ClusterIssuer
+  secretName: server-cert
+  duration: 2160h
+  renewBefore: 240h
+  dnsNames:
+    - amp.amp-system.svc
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  usages:
+    - client auth
+    - server auth

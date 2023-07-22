@@ -23,7 +23,7 @@ spec:
       volumes:
         - name: cert-vol
           secret:
-            secretName: amp-cert
+            secretName: server-cert
       containers:
         - name: amp
           image: txn2/amp:latest
@@ -35,8 +35,10 @@ spec:
               value: "8443"
             - name: MODE
               value: "release"
-            - name: CERT_PATH
-              value: "/cert"
+            - name: CERT_PATH_CRT
+              value: "/cert/tls.crt"
+            - name: CERT_PATH_KEY
+              value: "/cert/tls.key"
           ports:
             - name: http-int
               containerPort: 8443

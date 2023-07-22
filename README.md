@@ -59,43 +59,7 @@ Refer to the example implementation at [txn2/amp-wh-example](https://github.com/
 
 ## Install
 
-```shell script
-git clone git@github.com:txn2/amp.git
-cd amp
-
-# create amp-system namespace
-kubectl apply -f ./k8s/00-namespace.yml
-```
-
-Create Certificate as Kubernets Secret in the new `amp-system` Namespace:
-
-```shell script
-curl https://raw.githubusercontent.com/IBM/istio101/master/presentation/scripts/install/kubernetes/webhook-create-signed-cert.sh -o cert-gen.sh
-
-chmod 775 cert-gen.sh
-
-./cert-gen.sh --service amp --namespace amp-system --secret amp-cert
-```
-
-Create RBAC access controls, a Service and `amp` Deployment:
-```shell script
-# setup rbac for apm
-kubectl apply -f ./k8s/01-rbac.yml
-
-# create the amp service used by the webhook configuration
-kubectl apply -f ./k8s/10-service.yml
-
-# create the amp deployment
-kubectl apply -f ./k8s/30-deployment.yml
-```
-
-```shell script
-kubectl apply -f ./k8s/80-webhook.yml
-```
-
-## TLS Certificates
-
-NOTE: AMP appemts to reload certificates 
+see [k8s/README.md](k8s/README.md)
 
 ## Development
 
