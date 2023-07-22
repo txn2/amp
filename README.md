@@ -89,16 +89,13 @@ kubectl apply -f ./k8s/10-service.yml
 kubectl apply -f ./k8s/30-deployment.yml
 ```
 
-Create a `caBundle` required for the `./k8s/80-webhook.yml` configuration:
-```shell script
-kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}'
-```
-
-Replace the `caBundle` key in `./k8s/80-webhook.yml` with the value returned from the previous command and apply the following webhook configuration:
-
 ```shell script
 kubectl apply -f ./k8s/80-webhook.yml
 ```
+
+## TLS Certificates
+
+NOTE: AMP appemts to reload certificates 
 
 ## Development
 

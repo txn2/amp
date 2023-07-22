@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net"
@@ -34,8 +35,8 @@ var (
 	modeEnv                   = getEnv("MODE", "release")
 	httpReadTimeoutEnv        = getEnv("HTTP_READ_TIMEOUT", "10")
 	httpWriteTimeoutEnv       = getEnv("HTTP_WRITE_TIMEOUT", "10")
-	certPathCrtEnv            = getEnv("CERT_PATH_CRT", "/cert/tls.crt")
-	certPathKeyEnv            = getEnv("CERT_PATH_KEY", "/cert/tls.key")
+	certPathCrtEnv            = getEnv("CERT_PATH_CRT", "tls.crt")
+	certPathKeyEnv            = getEnv("CERT_PATH_KEY", "tls.key")
 	mutationEpAnnotationEnv   = getEnv("MUTATION_EP_ANNOTATION", "mutation.amp.txn2.com/ep")
 	validationEpAnnotationEnv = getEnv("VALIDATION_EP_ANNOTATION", "validation.amp.txn2.com/ep")
 )
@@ -216,10 +217,22 @@ func main() {
 		ReadTimeout:    time.Duration(*httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(*httpWriteTimeout) * time.Second,
 		MaxHeaderBytes: 1 << 20, // 1 MB
+		TLSConfig:      &tls.Config{},
 	}
 
 	if *certPathKey != "" && *certPathCrt != "" {
-		err = s.ListenAndServeTLS(*certPathCrt, *certPathKey)
+		kpr, err := amp.NewKeypairReloader(*certPathCrt, *certPathKey, logger)
+		if err != nil {
+			logger.Fatal("NewKeypairReloader failed to load cert",
+				zap.Stringp("certPathKey", certPathKey),
+				zap.Stringp("certPathCrt", certPathCrt),
+				zap.Error(err),
+			)
+		}
+
+		s.TLSConfig.GetCertificate = kpr.GetCertificateFunc()
+
+		err = s.ListenAndServeTLS("", "")
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
@@ -227,6 +240,8 @@ func main() {
 	}
 
 	// fallback to plain HTTP
+	logger.Warn("Empty TLS keypair, falling back to plain HTTP. If this is a production" +
+		" server you may need to check your environment variables CERT_PATH_CRT and CERT_PATH_KEY.")
 	err = s.ListenAndServe()
 	if err != nil {
 		logger.Fatal(err.Error())

@@ -1,5 +1,7 @@
 .idea
 dist
+*.crt
+*.key
 
 # Binaries for programs and plugins
 *.exe
