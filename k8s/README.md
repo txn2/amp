@@ -15,7 +15,7 @@ Create the `amp-system` Service
 kubectl apply -f ./10-service.yml
 ```
 
-If using cert-manager (recommended), see ./000-cert-manager/README.md
+If using cert-manager (recommended), see [./000-cert-manager/README.md](./000-cert-manager/README.md)
 
 Create `server` certificate for AMP
 ```shell
